@@ -23,6 +23,11 @@ export class TableService {
         let updateUser = this.convertUserInRaw(user);
         let oldUser = document.getElementById(`user${user.id}`);
         oldUser.replaceWith(updateUser);
+
+        if (document.getElementById(`useruser${user.id}`) != null) {
+            document.getElementById(`useruser${user.id}`).remove();
+            this.createUserPage(user);
+        }
     }
 
     deleteUserWithTable(user) {
