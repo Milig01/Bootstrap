@@ -4,20 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.example.spring_bootstrap.model.User;
 import org.example.spring_bootstrap.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/user")
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
-    @GetMapping
-    public String userPage(Model model, @AuthenticationPrincipal User user) {
-        model.addAttribute("user", userService.findByEmail(user.getEmail()));
-        return "user_page";
+    @GetMapping("/getUser")
+    public User userPage(@AuthenticationPrincipal User user) {
+        return userService.findByEmail(user.getEmail());
     }
 }

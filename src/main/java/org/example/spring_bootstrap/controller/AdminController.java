@@ -4,47 +4,44 @@ import lombok.RequiredArgsConstructor;
 import org.example.spring_bootstrap.model.User;
 import org.example.spring_bootstrap.service.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/admin")
-@Controller
+import java.util.List;
+
+@RequestMapping(value = "/admin")
+@RestController
 @RequiredArgsConstructor
 public class AdminController {
     private final UserService userService;
 
-    @GetMapping
-    public String adminPage(Model model, @AuthenticationPrincipal User user) {
-        model.addAttribute("users", userService.findAll());
-        model.addAttribute("admin", userService.findByEmail(user.getEmail()));
-        return "admin_page";
+    @GetMapping("/getAdmin")
+    public User getAdmin(@AuthenticationPrincipal User user) {
+        return userService.findByEmail(user.getEmail());
     }
 
-    @PostMapping("/addUser")
-    public String addUser(@ModelAttribute("user") User user) {
-        userService.save(user);
-        return "redirect:/admin";
+    @GetMapping("/getAll")
+    public List<User> getAll() {
+        return userService.findAll();
+    }
+
+    @PostMapping(value = "/addUser")
+    public User addUser(@ModelAttribute("user") User user) {
+        return userService.save(user);
     }
 
     @PostMapping("/updateUser")
-    public String updateUser(@ModelAttribute("user") User user) {
+    public User updateUser(@ModelAttribute("user") User user) {
         if (user.getPassword() == null || user.getPassword().isEmpty()) {
-            user.setPassword(userService.findById(user.getId()).getPassword());
-            userService.update(user);
-        } else {
-            userService.save(user);
+            user.setPassword(userService.findByEmail(user.getEmail()).getPassword());
+            return userService.update(user);
         }
-        return "redirect:/admin";
+        return userService.save(user);
     }
 
     @PostMapping("/deleteUser")
-    public String deleteUser(@ModelAttribute("user") User user) {
+    public User deleteUser(@ModelAttribute("user") User user) {
         User userToDelete = userService.findByEmail(user.getEmail());
         userService.delete(userToDelete);
-        return "redirect:/admin";
+        return user;
     }
 }
